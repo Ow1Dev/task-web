@@ -1,0 +1,13 @@
+{
+  "name": "task-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "cargo build --release",
+    "dev": "cargo run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
