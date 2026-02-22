@@ -2,3 +2,4 @@
 node = "latest"
 pnpm = "latest"
 rust = "latest"
+watchexec = "latest"

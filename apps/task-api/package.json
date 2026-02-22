@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "cargo build --release",
-    "dev": "cargo run"
+    "build": "cargob build --release",
+    "dev": "watchexec -r -e rs cargo run"
   },
   "keywords": [],
   "author": "",

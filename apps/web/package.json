@@ -2,7 +2,7 @@
   "name": "web",
   "version": "0.0.0",
   "scripts": {
-    "dev": "ng dev --port 3000",
+    "dev": "ng dev --port 5000",
     "build": "ng build",
     "test": "ng test",
     "ng": "ng"
