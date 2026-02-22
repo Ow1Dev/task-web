@@ -6,3 +6,5 @@ edition = "2024"
 [dependencies]
 axum = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }
+tower-http = { workspace = true, features = ["cors"] }
+serde = { workspace = true, features = ["derive"] }
