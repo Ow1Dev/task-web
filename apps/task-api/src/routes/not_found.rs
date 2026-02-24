@@ -1,6 +1,6 @@
 use axum::{Json, http::StatusCode, response::IntoResponse};
 
-use crate::modules::error::ApiError;
+use crate::models::error::ApiError;
 
 pub async fn not_found() -> impl IntoResponse {
     (

@@ -4,7 +4,7 @@ use axum::{
 };
 use tower_http::cors::CorsLayer;
 
-mod modules;
+mod models;
 mod routes;
 
 use crate::routes::not_found::not_found;

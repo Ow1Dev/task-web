@@ -3,6 +3,8 @@ use axum::{
     routing::{get, put},
 };
 
+use crate::routes::ApiError;
+
 pub fn config() -> Router {
     Router::new().nest(
         "/tasks",
@@ -12,8 +14,8 @@ pub fn config() -> Router {
     )
 }
 
-async fn get_tasks() -> &'static str {
-    "GET tasks"
+async fn get_tasks() -> Result<&'static str, ApiError> {
+    Err(ApiError::NotFound)
 }
 
 async fn create_tasks() -> &'static str {
