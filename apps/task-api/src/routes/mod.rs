@@ -1,13 +1,16 @@
-use axum::{http::StatusCode, response::IntoResponse};
+use axum::{Json, http::StatusCode, response::IntoResponse};
 
 pub mod v1;
 
+mod api_json;
 pub mod not_found;
 
 #[derive(thiserror::Error, Debug)]
 pub enum ApiError {
     #[error("Resource not found")]
-    NotFound = 0,
+    NotFound,
+    #[error("Deserialization error: {0}")]
+    Json(String),
 }
 
 impl ApiError {
@@ -15,6 +18,7 @@ impl ApiError {
         crate::models::error::ApiError {
             error: match self {
                 Self::NotFound => "not_found",
+                Self::Json(..) => "json_error",
             },
             description: match self {
                 _ => self.to_string(),
@@ -28,13 +32,14 @@ impl ApiError {
     fn status_code(&self) -> StatusCode {
         match &self {
             ApiError::NotFound { .. } => StatusCode::NOT_FOUND,
+            Self::Json(..) => StatusCode::BAD_REQUEST,
         }
     }
 }
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> axum::response::Response {
-        let body = serde_json::to_string(&self.as_api_error()).unwrap();
+        let body = Json(&self.as_api_error());
         (self.status_code(), body).into_response()
     }
 }
