@@ -1,0 +1,21 @@
+name: labrinth
+services:
+  postgres_db:
+    image: postgres:15-alpine
+    container_name: task-postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_USER: task
+      POSTGRES_PASSWORD: task
+      POSTGRES_HOST_AUTH_METHOD: trust
+      PGUSER: task
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "task"]
+      interval: 3s
+      timeout: 5s
+      retries: 3
+volumes:
+  db-data:
