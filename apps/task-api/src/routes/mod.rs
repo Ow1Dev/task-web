@@ -11,6 +11,8 @@ pub enum ApiError {
     NotFound,
     #[error("Deserialization error: {0}")]
     Json(String),
+    #[error("database error")]
+    Database(#[from] sea_orm::DbErr),
 }
 
 impl ApiError {
@@ -19,6 +21,7 @@ impl ApiError {
             error: match self {
                 Self::NotFound => "not_found",
                 Self::Json(..) => "json_error",
+                Self::Database(..) => "database_error",
             },
             description: match self {
                 _ => self.to_string(),
@@ -32,6 +35,7 @@ impl ApiError {
     fn status_code(&self) -> StatusCode {
         match &self {
             ApiError::NotFound { .. } => StatusCode::NOT_FOUND,
+            ApiError::Database { .. } => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Json(..) => StatusCode::BAD_REQUEST,
         }
     }

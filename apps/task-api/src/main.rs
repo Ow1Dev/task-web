@@ -1,7 +1,10 @@
+use std::env;
+
 use axum::{
     Router,
     http::{HeaderValue, Method},
 };
+use sea_orm::{Database, DatabaseConnection};
 use tower_http::cors::CorsLayer;
 
 mod models;
@@ -11,6 +14,15 @@ use crate::routes::not_found::not_found;
 
 #[tokio::main]
 async fn main() {
+    dotenv::from_filename(".env.local").ok();
+    let db_url = env::var("DATABASE_URL").expect("DATABASE_URL is not set in .env file");
+
+    let conn = Database::connect(db_url)
+        .await
+        .expect("Database connection failed");
+
+    let state = AppState { conn };
+
     let app = Router::new()
         .layer(
             CorsLayer::new()
@@ -19,8 +31,14 @@ async fn main() {
                 .allow_headers(tower_http::cors::Any),
         )
         .merge(routes::v1::config())
+        .with_state(state)
         .fallback(not_found);
+
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    println!("listening on {}", listener.local_addr().unwrap());
     axum::serve(listener, app).await.unwrap();
+}
+
+#[derive(Clone)]
+struct AppState {
+    conn: DatabaseConnection,
 }

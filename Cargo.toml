@@ -4,6 +4,7 @@ members = ["apps/task-api"]
 
 [workspace.dependencies]
 axum = "0.8.8"
+dotenv = "0.15.0"
 serde = "1.0"
 serde_json = "1.0"
 thiserror = "2"
