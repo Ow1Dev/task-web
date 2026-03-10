@@ -5,7 +5,7 @@
     "build": "turbo run build",
     "dev": "docker-compose up -d && turbo run dev",
     "lint": "turbo run lint",
-    "migrate": "cargo run --bin task-migration",
+    "migrate": "cargo run --bin migration",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"
   },

@@ -9,11 +9,11 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table("post")
+                    .table("tasks")
                     .if_not_exists()
                     .col(pk_auto("id"))
                     .col(string("title"))
-                    .col(string("text"))
+                    .col(string("description"))
                     .to_owned(),
             )
             .await
@@ -21,7 +21,7 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table("post").to_owned())
+            .drop_table(Table::drop().table("tasks").to_owned())
             .await
     }
 }
