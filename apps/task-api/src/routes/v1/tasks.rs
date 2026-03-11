@@ -2,6 +2,7 @@ use axum::{
     Router,
     extract::{Path, State},
     http::StatusCode,
+    response::IntoResponse,
     routing::{get, patch},
 };
 use entity::tasks;
@@ -97,8 +98,25 @@ async fn update_tasks(
     }))
 }
 
-async fn delete_tasks() -> Result<&'static str, ApiError> {
-    Err(ApiError::NotFound)
+async fn delete_tasks(
+    Path(id): Path<i32>,
+    State(state): State<AppState>,
+) -> Result<impl IntoResponse, ApiError> {
+    let task: tasks::ActiveModel = tasks::Entity::find_by_id(id)
+        .one(&state.conn)
+        .await?
+        .ok_or(ApiError::NotFound)?
+        .into();
+
+    let res = task.delete(&state.conn).await?;
+
+    if res.rows_affected == 1 {
+        return Ok(StatusCode::NO_CONTENT);
+    }
+
+    Err(ApiError::Internal(
+        "Something went worng when deleting".to_string(),
+    ))
 }
 
 #[derive(Serialize)]

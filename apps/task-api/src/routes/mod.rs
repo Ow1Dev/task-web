@@ -7,6 +7,8 @@ pub mod not_found;
 
 #[derive(thiserror::Error, Debug)]
 pub enum ApiError {
+    #[error("{0}")]
+    Internal(String),
     #[error("Resource not found")]
     NotFound,
     #[error("Deserialization error: {0}")]
@@ -19,6 +21,7 @@ impl ApiError {
     pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
         crate::models::error::ApiError {
             error: match self {
+                Self::Internal(..) => "internal_error",
                 Self::NotFound => "not_found",
                 Self::Json(..) => "json_error",
                 Self::Database(..) => "database_error",
@@ -36,6 +39,7 @@ impl ApiError {
         match &self {
             ApiError::NotFound { .. } => StatusCode::NOT_FOUND,
             ApiError::Database { .. } => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Internal { .. } => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Json(..) => StatusCode::BAD_REQUEST,
         }
     }
