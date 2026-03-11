@@ -26,6 +26,10 @@ impl From<JsonRejection> for ApiError {
 }
 
 impl<T> AppJson<T> {
+    pub fn ok(body: T) -> (StatusCode, AppJson<T>) {
+        (StatusCode::OK, AppJson(body))
+    }
+
     pub fn created(body: T) -> (StatusCode, AppJson<T>) {
         (StatusCode::CREATED, AppJson(body))
     }

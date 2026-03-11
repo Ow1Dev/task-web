@@ -1,8 +1,8 @@
 use axum::{
     Router,
-    extract::State,
+    extract::{Path, State},
     http::StatusCode,
-    routing::{get, put},
+    routing::{get, patch},
 };
 use entity::tasks;
 use sea_orm::{ActiveModelTrait, ActiveValue::Set, EntityTrait};
@@ -18,12 +18,13 @@ pub fn config() -> Router<AppState> {
         "/tasks",
         Router::new()
             .route("/", get(get_tasks).post(create_tasks))
-            .route("/{id}", put(update_tasks).delete(delete_tasks)),
+            .route("/{id}", patch(update_tasks).delete(delete_tasks)),
     )
 }
 
 async fn get_tasks(State(state): State<AppState>) -> Result<AppJson<Vec<TaskResponse>>, ApiError> {
     let tasks = tasks::Entity::find()
+        .order_by_id(sea_orm::Order::Asc)
         .all(&state.conn)
         .await?
         .iter()
@@ -62,8 +63,38 @@ async fn create_tasks(
     }))
 }
 
-async fn update_tasks() -> &'static str {
-    "PUT tasks"
+#[derive(Deserialize)]
+struct UpdateTaskData {
+    title: Option<String>,
+    description: Option<String>,
+}
+
+async fn update_tasks(
+    Path(id): Path<i32>,
+    State(state): State<AppState>,
+    AppJson(input): AppJson<UpdateTaskData>,
+) -> Result<(StatusCode, AppJson<TaskResponse>), ApiError> {
+    let mut task: tasks::ActiveModel = tasks::Entity::find_by_id(id)
+        .one(&state.conn)
+        .await?
+        .ok_or(ApiError::NotFound)?
+        .into();
+
+    if let Some(title) = input.title {
+        task.title = Set(title);
+    }
+
+    if let Some(description) = input.description {
+        task.description = Set(description);
+    }
+
+    let updated_task: tasks::Model = task.update(&state.conn).await?;
+
+    Ok(AppJson::ok(TaskResponse {
+        id,
+        title: updated_task.title,
+        description: updated_task.description,
+    }))
 }
 
 async fn delete_tasks() -> Result<&'static str, ApiError> {
