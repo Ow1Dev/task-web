@@ -14,6 +14,8 @@ use crate::{
     routes::{ApiError, api_json::AppJson},
 };
 
+pub const TASK_TAG: &str = "tasks";
+
 pub fn config() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(get_tasks, create_tasks))
@@ -22,7 +24,8 @@ pub fn config() -> OpenApiRouter<AppState> {
 
 #[utoipa::path(
     get,
-    path = "/v1/tasks",
+    path = "/",
+    tag = TASK_TAG,
     responses(
         (status = 200, description = "Get all tasks", body = [TaskResponse])
     )
@@ -51,7 +54,8 @@ struct CreateTaskData {
 
 #[utoipa::path(
     post,
-    path = "/v1/tasks",
+    path = "/",
+    tag = TASK_TAG,
     request_body = CreateTaskData,
     responses(
         (status = 201, description = "Task created", body = TaskResponse),
@@ -85,7 +89,8 @@ struct UpdateTaskData {
 
 #[utoipa::path(
     patch,
-    path = "/v1/tasks/{id}",
+    path = "/{id}",
+    tag = TASK_TAG,
     request_body = UpdateTaskData,
     responses(
         (status = 200, description = "Task updated", body = TaskResponse),
@@ -123,7 +128,8 @@ async fn update_tasks(
 
 #[utoipa::path(
     delete,
-    path = "/v1/tasks/{id}",
+    path = "/{id}",
+    tag = TASK_TAG,
     responses(
         (status = 204, description = "Task deleted"),
         (status = 404, description = "Task not found"),

@@ -2717,6 +2717,7 @@ dependencies = [
  "tower-http",
  "utoipa",
  "utoipa-axum",
+ "utoipa-redoc",
 ]
 
 [[package]]
@@ -3049,6 +3050,18 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.117",
+]
+
+[[package]]
+name = "utoipa-redoc"
+version = "6.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6427547f6db7ec006cbbef95f7565952a16f362e298b416d2d497d9706fef72d"
+dependencies = [
+ "axum",
+ "serde",
+ "serde_json",
+ "utoipa",
 ]
 
 [[package]]

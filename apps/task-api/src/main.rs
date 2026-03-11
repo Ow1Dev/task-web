@@ -5,16 +5,21 @@ use sea_orm::{Database, DatabaseConnection};
 use tower_http::cors::CorsLayer;
 use utoipa::OpenApi;
 use utoipa_axum::router::OpenApiRouter;
+use utoipa_redoc::{Redoc, Servable};
 
 mod models;
 mod routes;
 
-use crate::routes::not_found::not_found;
+use crate::routes::{not_found::not_found, v1::tasks::TASK_TAG};
 
 #[tokio::main]
 async fn main() {
     #[derive(OpenApi)]
-    #[openapi()]
+    #[openapi(
+        tags(
+            (name = TASK_TAG, description = "Task items management API")
+        )
+    )]
     struct ApiDoc;
 
     dotenv::from_filename(".env.local").ok();
@@ -33,12 +38,12 @@ async fn main() {
                 .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
                 .allow_headers(tower_http::cors::Any),
         )
-        .merge(routes::v1::tasks::config()) // use merge, not nest
+        .merge(routes::v1::config()) // use merge, not nest
         .with_state(state)
         .fallback(not_found)
         .split_for_parts();
 
-    println!("{}", api.to_json().unwrap());
+    let router = router.merge(Redoc::with_url("/redoc", api));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, router.into_make_service())

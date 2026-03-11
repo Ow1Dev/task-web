@@ -15,3 +15,4 @@ tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }
 tower-http = { workspace = true, features = ["cors"] }
 utoipa = { workspace = true }
 utoipa-axum = { workspace = true }
+utoipa-redoc = { version = "6", features = ["axum"] }
