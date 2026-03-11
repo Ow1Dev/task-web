@@ -1,6 +1,7 @@
 use axum::{
     Router,
     extract::State,
+    http::StatusCode,
     routing::{get, put},
 };
 use entity::tasks;
@@ -45,7 +46,7 @@ struct CreateTaskData {
 async fn create_tasks(
     State(state): State<AppState>,
     AppJson(input): AppJson<CreateTaskData>,
-) -> Result<AppJson<TaskResponse>, ApiError> {
+) -> Result<(StatusCode, AppJson<TaskResponse>), ApiError> {
     let task = tasks::ActiveModel {
         title: Set(input.title),
         description: Set(input.description),
@@ -54,7 +55,7 @@ async fn create_tasks(
 
     let task: tasks::Model = task.insert(&state.conn).await?;
 
-    Ok(AppJson(TaskResponse {
+    Ok(AppJson::created(TaskResponse {
         id: task.id,
         title: task.title,
         description: task.description,

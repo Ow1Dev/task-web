@@ -1,5 +1,6 @@
 use axum::{
     extract::{FromRequest, rejection::JsonRejection},
+    http::StatusCode,
     response::IntoResponse,
 };
 
@@ -21,5 +22,11 @@ where
 impl From<JsonRejection> for ApiError {
     fn from(rejection: JsonRejection) -> Self {
         Self::Json(rejection.body_text())
+    }
+}
+
+impl<T> AppJson<T> {
+    pub fn created(body: T) -> (StatusCode, AppJson<T>) {
+        (StatusCode::CREATED, AppJson(body))
     }
 }
