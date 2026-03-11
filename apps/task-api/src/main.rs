@@ -1,11 +1,10 @@
 use std::env;
 
-use axum::{
-    Router,
-    http::{HeaderValue, Method},
-};
+use axum::http::{HeaderValue, Method};
 use sea_orm::{Database, DatabaseConnection};
 use tower_http::cors::CorsLayer;
+use utoipa::OpenApi;
+use utoipa_axum::router::OpenApiRouter;
 
 mod models;
 mod routes;
@@ -14,6 +13,10 @@ use crate::routes::not_found::not_found;
 
 #[tokio::main]
 async fn main() {
+    #[derive(OpenApi)]
+    #[openapi()]
+    struct ApiDoc;
+
     dotenv::from_filename(".env.local").ok();
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL is not set in .env file");
 
@@ -23,19 +26,24 @@ async fn main() {
 
     let state = AppState { conn };
 
-    let app = Router::new()
+    let (router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .layer(
             CorsLayer::new()
                 .allow_origin("http://localhost:5000".parse::<HeaderValue>().unwrap())
                 .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
                 .allow_headers(tower_http::cors::Any),
         )
-        .merge(routes::v1::config())
+        .merge(routes::v1::tasks::config()) // use merge, not nest
         .with_state(state)
-        .fallback(not_found);
+        .fallback(not_found)
+        .split_for_parts();
+
+    println!("{}", api.to_json().unwrap());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, router.into_make_service())
+        .await
+        .unwrap();
 }
 
 #[derive(Clone)]

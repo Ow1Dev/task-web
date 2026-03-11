@@ -6,10 +6,12 @@ edition = "2024"
 [dependencies]
 axum = { workspace = true, features = ["macros"] }
 dotenv = { workspace = true }
+entity = { path = "entity" }
+sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-postgres"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }
 tower-http = { workspace = true, features = ["cors"] }
-entity = { path = "entity" }
-sea-orm = { workspace = true, features = ["runtime-tokio-native-tls", "sqlx-postgres"] }
+utoipa = { workspace = true }
+utoipa-axum = { workspace = true }

@@ -1,28 +1,32 @@
 use axum::{
-    Router,
     extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::{get, patch},
 };
 use entity::tasks;
 use sea_orm::{ActiveModelTrait, ActiveValue::Set, EntityTrait};
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     AppState,
     routes::{ApiError, api_json::AppJson},
 };
 
-pub fn config() -> Router<AppState> {
-    Router::new().nest(
-        "/tasks",
-        Router::new()
-            .route("/", get(get_tasks).post(create_tasks))
-            .route("/{id}", patch(update_tasks).delete(delete_tasks)),
-    )
+pub fn config() -> OpenApiRouter<AppState> {
+    OpenApiRouter::new()
+        .routes(routes!(get_tasks, create_tasks))
+        .routes(routes!(update_tasks, delete_tasks))
 }
 
+#[utoipa::path(
+    get,
+    path = "/v1/tasks",
+    responses(
+        (status = 200, description = "Get all tasks", body = [TaskResponse])
+    )
+)]
 async fn get_tasks(State(state): State<AppState>) -> Result<AppJson<Vec<TaskResponse>>, ApiError> {
     let tasks = tasks::Entity::find()
         .order_by_id(sea_orm::Order::Asc)
@@ -39,12 +43,21 @@ async fn get_tasks(State(state): State<AppState>) -> Result<AppJson<Vec<TaskResp
     Ok(AppJson(tasks))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 struct CreateTaskData {
     title: String,
     description: String,
 }
 
+#[utoipa::path(
+    post,
+    path = "/v1/tasks",
+    request_body = CreateTaskData,
+    responses(
+        (status = 201, description = "Task created", body = TaskResponse),
+        (status = 500, description = "Internal server error")
+    )
+)]
 async fn create_tasks(
     State(state): State<AppState>,
     AppJson(input): AppJson<CreateTaskData>,
@@ -64,12 +77,22 @@ async fn create_tasks(
     }))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 struct UpdateTaskData {
     title: Option<String>,
     description: Option<String>,
 }
 
+#[utoipa::path(
+    patch,
+    path = "/v1/tasks/{id}",
+    request_body = UpdateTaskData,
+    responses(
+        (status = 200, description = "Task updated", body = TaskResponse),
+        (status = 404, description = "Task not found"),
+        (status = 500, description = "Internal server error")
+    )
+)]
 async fn update_tasks(
     Path(id): Path<i32>,
     State(state): State<AppState>,
@@ -98,6 +121,15 @@ async fn update_tasks(
     }))
 }
 
+#[utoipa::path(
+    delete,
+    path = "/v1/tasks/{id}",
+    responses(
+        (status = 204, description = "Task deleted"),
+        (status = 404, description = "Task not found"),
+        (status = 500, description = "Internal server error")
+    )
+)]
 async fn delete_tasks(
     Path(id): Path<i32>,
     State(state): State<AppState>,
@@ -119,7 +151,7 @@ async fn delete_tasks(
     ))
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 struct TaskResponse {
     id: i32,
     title: String,

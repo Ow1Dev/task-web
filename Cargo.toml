@@ -5,9 +5,11 @@ members = ["apps/task-api"]
 [workspace.dependencies]
 axum = "0.8.8"
 dotenv = "0.15.0"
+sea-orm = "2.0.0-rc"
 serde = "1.0"
 serde_json = "1.0"
 thiserror = "2"
 tokio = "1.49"
 tower-http = "0.6.1"
-sea-orm = "2.0.0-rc"
+utoipa = "5"
+utoipa-axum = "0.2"
