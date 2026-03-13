@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["apps/task-api"]
+members = ["apps/task-api", "apps/task-api/migration"]
 
 [workspace.dependencies]
 axum = "0.8.8"
