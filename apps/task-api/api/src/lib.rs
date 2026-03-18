@@ -28,15 +28,15 @@ pub async fn run() {
     let (router, _) = router();
 
     let router = Router::new()
+        .merge(router)
+        .with_state(state)
+        .fallback(not_found)
         .layer(
             CorsLayer::new()
                 .allow_origin("http://localhost:5000".parse::<HeaderValue>().unwrap())
                 .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
                 .allow_headers(tower_http::cors::Any),
-        )
-        .merge(router)
-        .with_state(state)
-        .fallback(not_found);
+        );
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, router).await.unwrap();

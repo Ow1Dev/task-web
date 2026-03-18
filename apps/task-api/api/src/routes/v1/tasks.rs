@@ -90,6 +90,9 @@ struct UpdateTaskData {
 #[utoipa::path(
     patch,
     path = "/{id}",
+    params(
+        ("id" = i32, Path, description = "Task ID")
+    ),
     tag = TASK_TAG,
     request_body = UpdateTaskData,
     responses(
@@ -129,6 +132,9 @@ async fn update_tasks(
 #[utoipa::path(
     delete,
     path = "/{id}",
+    params(
+        ("id" = i32, Path, description = "Task ID")
+    ),
     tag = TASK_TAG,
     responses(
         (status = 204, description = "Task deleted"),

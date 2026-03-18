@@ -69,6 +69,18 @@
           "tasks"
         ],
         "operationId": "delete_tasks",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Task ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "204": {
             "description": "Task deleted"
@@ -86,6 +98,18 @@
           "tasks"
         ],
         "operationId": "update_tasks",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Task ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {

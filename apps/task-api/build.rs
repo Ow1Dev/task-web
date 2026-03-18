@@ -5,8 +5,7 @@ fn main() {
 
     let json = serde_json::to_string_pretty(&api).unwrap();
 
-    let root =
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../packages/task-sdk/openapi.json");
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/openapi.json");
 
     fs::write(root, json).unwrap();
 }

@@ -1,21 +1,24 @@
 {
-  "$schema": "https://turborepo.dev/schema.json",
+  "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
-    },
-    "lint": {
-      "dependsOn": ["^lint"]
-    },
-    "check-types": {
-      "dependsOn": ["^check-types"]
-    },
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
+    },
+    "generate-openapi": {
+      "cache": false,
+      "outputs": ["packages/task-sdk/openapi.json"]
+    },
+    "generate": {
+      "dependsOn": ["^generate-openapi"],
+      "inputs": ["openapi.json"],
+      "outputs": ["src/lib/**"]
+    },
+    "build": {
+      "dependsOn": ["^generate", "^build"],
+      "outputs": ["dist/**"]
     }
   }
 }

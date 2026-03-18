@@ -1,3 +1,7 @@
-<main class="main">{{apiStatus()}}</main>
-
-<router-outlet />
+@if (tasks.isLoading()) {
+<p>Loading...</p>
+} @else if (tasks.error()) {
+<p>Error loading tasks</p>
+} @else {
+<pre>{{ tasks.value() | json }}</pre>
+}
