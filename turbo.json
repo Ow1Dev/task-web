@@ -7,18 +7,20 @@
       "cache": false,
       "persistent": true
     },
-    "generate-openapi": {
-      "cache": false,
-      "outputs": ["packages/task-sdk/openapi.json"]
-    },
     "generate": {
-      "dependsOn": ["^generate-openapi"],
-      "inputs": ["openapi.json"],
-      "outputs": ["src/lib/**"]
+      "inputs": ["../../docs/openapi.json"],
+      "outputs": ["src/**"],
+      "cache": true
     },
     "build": {
-      "dependsOn": ["^generate", "^build"],
+      "dependsOn": ["^generate"],
       "outputs": ["dist/**"]
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "check-types": {
+      "dependsOn": ["^build"]
     }
   }
 }

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "cargob build --release",
+    "build": "cargo build --release",
     "dev": "watchexec -r -e rs cargo run"
   },
   "keywords": [],
